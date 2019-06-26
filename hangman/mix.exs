@@ -20,7 +20,6 @@ defmodule Hangman.MixProject do
   defp deps do
     [
       {:dictionary, path: "../dictionary"},
-      {:inflex, "~> 2.0"},
     ]
   end
 end
