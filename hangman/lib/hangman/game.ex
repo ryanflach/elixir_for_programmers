@@ -6,9 +6,8 @@ defmodule Hangman.Game do
     used: MapSet.new()
   )
 
-  def new_game() do
-    %__MODULE__{letters: Dictionary.random_word() |> String.codepoints()}
-  end
+  def new_game(word), do: %__MODULE__{letters: word |> String.codepoints()}
+  def new_game(), do: new_game(Dictionary.random_word())
 
   def make_move(%__MODULE__{game_state: state} = game, _guess) when state in ~w(won lost)a,
     do: {game, tally(game)}
@@ -24,7 +23,27 @@ defmodule Hangman.Game do
     game |> Map.put(:game_state, :already_used)
   end
 
-  defp accept_move(%__MODULE__{} = game, guess, _already_guessed) do
-    game |> Map.put(:used, MapSet.put(game.used, guess))
+  defp accept_move(%__MODULE__{} = game, guess, _not_already_guessed) do
+    game
+    |> Map.put(:used, MapSet.put(game.used, guess))
+    |> score_guess(Enum.member?(game.letters, guess))
   end
+
+  defp score_guess(%__MODULE__{} = game, _good_guess = true) do
+    new_state =
+      game.letters
+      |> MapSet.new()
+      |> MapSet.subset?(game.used)
+      |> maybe_won()
+
+    Map.put(game, :game_state, new_state)
+  end
+
+  defp score_guess(%__MODULE__{} = game, _not_good_guess) do
+    # PLACEHOLDER - will need to decrement turns left and return appropriate game state
+    game
+  end
+
+  defp maybe_won(true), do: :won
+  defp maybe_won(_), do: :good_guess
 end
