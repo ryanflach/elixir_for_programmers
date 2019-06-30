@@ -10,16 +10,20 @@ defmodule Hangman.Game do
   def new_game(), do: new_game(Dictionary.random_word())
 
   def make_move(%__MODULE__{game_state: state} = game, _guess) when state in ~w(won lost)a,
-    do: {game, tally(game)}
+    do: game
 
-  def make_move(%__MODULE__{} = game, guess) do
-    game = accept_move(game, guess, MapSet.member?(game.used, guess))
-    {game, tally(game)}
+  def make_move(%__MODULE__{} = game, guess),
+    do: accept_move(game, guess, MapSet.member?(game.used, guess))
+
+  def tally(%__MODULE__{} = game) do
+    %{
+      game_state: game.game_state,
+      turns_left: game.turns_left,
+      letters: game.letters |> reveal_guessed(game.used)
+    }
   end
 
-  defp tally(_guess), do: 123
-
-  defp accept_move(%__MODULE__{} = game, guess, _already_guessed = true) do
+  defp accept_move(%__MODULE__{} = game, _guess, _already_guessed = true) do
     game |> Map.put(:game_state, :already_used)
   end
 
@@ -54,4 +58,12 @@ defmodule Hangman.Game do
 
   defp maybe_won(true), do: :won
   defp maybe_won(_), do: :good_guess
+
+  defp reveal_guessed(letters, letters_used) do
+    letters
+    |> Enum.map(&reveal_letter(&1, MapSet.member?(letters_used, &1)))
+  end
+
+  defp reveal_letter(letter, _in_word = true), do: letter
+  defp reveal_letter(_letter, _not_in_word), do: "_"
 end
