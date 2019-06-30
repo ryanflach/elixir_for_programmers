@@ -39,9 +39,17 @@ defmodule Hangman.Game do
     Map.put(game, :game_state, new_state)
   end
 
-  defp score_guess(%__MODULE__{} = game, _not_good_guess) do
-    # PLACEHOLDER - will need to decrement turns left and return appropriate game state
+  defp score_guess(%__MODULE__{turns_left: 1} = game, _not_good_guess) do
     game
+    |> Map.put(:game_state, :lost)
+  end
+
+  defp score_guess(%__MODULE__{turns_left: turns_left} = game, _not_good_guess) do
+    %{
+      game |
+      turns_left: turns_left - 1,
+      game_state: :bad_guess
+    }
   end
 
   defp maybe_won(true), do: :won

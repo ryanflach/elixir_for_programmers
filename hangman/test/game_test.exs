@@ -42,11 +42,34 @@ defmodule GameTest do
 
   test "a guessed word is a won game" do
     game = Game.new_game("test")
-    {game, _tally} = Game.make_move(game, "t")
-    {game, _tally} = Game.make_move(game, "e")
-    {game, _tally} = Game.make_move(game, "s")
-    {game, _tally} = Game.make_move(game, "t")
-    assert game.game_state == :won
-    assert game.turns_left == 7
+    end_game = make_moves(String.codepoints("test"), game)
+
+    assert end_game.game_state == :won
+    assert end_game.turns_left == 7
+  end
+
+  test "a bad guess is recognized" do
+    game = Game.new_game("word")
+    {game, _tally} = Game.make_move(game, "x")
+    assert game.game_state == :bad_guess
+    assert game.turns_left == 6
+  end
+
+  test "a bad guess with 1 turn left is a lost game" do
+    game = Game.new_game("seventh")
+    end_game = make_moves(~w(a b c d f g i), game)
+
+    assert end_game.game_state == :lost
+  end
+
+  defp make_moves(moves, game) do
+    Enum.reduce(
+      moves,
+      game,
+      fn(letter, game) ->
+        {new_game, _tally} = Game.make_move(game, letter)
+        new_game
+      end
+    )
   end
 end
