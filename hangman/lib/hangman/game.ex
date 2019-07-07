@@ -10,10 +10,13 @@ defmodule Hangman.Game do
   def new_game(), do: new_game(Dictionary.random_word())
 
   def make_move(%__MODULE__{game_state: state} = game, _guess) when state in ~w(won lost)a,
-    do: game
+    do: return_with_tally(game)
 
-  def make_move(%__MODULE__{} = game, guess),
-    do: accept_move(game, guess, MapSet.member?(game.used, guess))
+  def make_move(%__MODULE__{} = game, guess) do
+    game
+    |> accept_move(guess, MapSet.member?(game.used, guess))
+    |> return_with_tally()
+  end
 
   def tally(%__MODULE__{} = game) do
     %{
@@ -67,4 +70,6 @@ defmodule Hangman.Game do
 
   defp reveal_letter(letter, _in_word = true), do: letter
   defp reveal_letter(_letter, _not_in_word), do: "_"
+
+  defp return_with_tally(game), do: {game, tally(game)}
 end
