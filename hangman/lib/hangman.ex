@@ -1,7 +1,8 @@
 defmodule Hangman do
-  alias Hangman.Server
-
-  def new_game(), do: Server.start_link()
+  def new_game() do
+    {:ok, pid} = Supervisor.start_child(Hangman.Supervisor, [])
+    pid
+  end
 
   def tally(game_pid), do: GenServer.call(game_pid, {:tally})
 
