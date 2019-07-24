@@ -11,4 +11,7 @@ defmodule GallowsWeb.HangmanView do
   def game_over?(_state), do: false
 
   def word_so_far(tally), do: tally.letters |> Enum.join(" ")
+
+  def turn(remaining, target) when target >= remaining, do: "opacity: 1.0"
+  def turn(_remaining, _target), do: "opacity: 0.1"
 end
