@@ -3,6 +3,10 @@
 </p>
 
 <p>
+  Letters guessed: <%= letters_guessed(@tally) %>
+</p>
+
+<p>
   Word so far: <%= word_so_far(@tally) %>
 </p>
 
